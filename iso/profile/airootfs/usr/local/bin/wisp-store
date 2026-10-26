@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+command -v dialog >/dev/null || { echo 'dialog is required.' >&2; exit 1; }
+command -v wisp >/dev/null || { echo 'wisp CLI is missing.' >&2; exit 1; }
+
+while true; do
+  choice=$(dialog --clear --title 'Wisp Store' --menu 'Choose a category. Packages are installed only after you confirm.' 18 76 8 \
+    apps 'Everyday apps (browser, editor, media)' \
+    gaming 'Gaming (Steam, Lutris, Heroic)' \
+    dev 'Development (Git, VS Code alternatives, tools)' \
+    back 'Exit store' 3>&1 1>&2 2>&3) || exit 0
+  case "$choice" in
+    apps)
+      pkg=$(dialog --title 'Everyday apps' --menu 'Choose an official repository package:' 14 70 5 \
+        firefox 'Firefox browser' \
+        vlc 'VLC media player' \
+        git 'Git version control' \
+        kate 'Kate text editor' 3>&1 1>&2 2>&3) || continue
+      wisp install --source repo "$pkg" || dialog --msgbox 'Install did not complete. See terminal output for details.' 7 60 || true
+      ;;
+    gaming)
+      pkg=$(dialog --title 'Gaming' --menu 'Choose a package. Some options may require multilib or additional setup:' 14 74 5 \
+        steam 'Steam (multilib repository may be required)' \
+        lutris 'Lutris game manager' \
+        mangohud 'MangoHud performance overlay' \
+        gamemode 'GameMode performance daemon' 3>&1 1>&2 2>&3) || continue
+      wisp install --source repo "$pkg" || dialog --msgbox 'Install did not complete. Check repository configuration and logs.' 7 60 || true
+      ;;
+    dev)
+      pkg=$(dialog --title 'Development' --menu 'Choose a package:' 14 70 5 \
+        git 'Git version control' \
+        neovim 'Neovim editor' \
+        code 'Visual Studio Code (source depends on configured repositories)' \
+        rust 'Rust toolchain' 3>&1 1>&2 2>&3) || continue
+      wisp install --source auto "$pkg" || dialog --msgbox 'Install did not complete. Check package availability.' 7 60 || true
+      ;;
+    back) exit 0 ;;
+  esac
+done
