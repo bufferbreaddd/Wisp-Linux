@@ -1,0 +1,10 @@
+[package]
+name = "wisp"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Command-line tools for the Wisp Linux distribution"
+
+[[bin]]
+name = "wisp"
+path = "src/main.rs"
