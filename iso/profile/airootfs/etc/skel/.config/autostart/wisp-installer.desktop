@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Install Wisp Linux
+Comment=Start the guided Wisp Linux installer
+Exec=kitty -- sudo /usr/local/bin/wisp-installer
+Terminal=false
+Categories=System;
