@@ -8,6 +8,12 @@ on:
       - 'wisp-cli/**'
       - 'Cargo.toml'
       - '.github/workflows/build-iso.yml'
+  pull_request:
+    paths:
+      - 'iso/**'
+      - 'wisp-cli/**'
+      - 'Cargo.toml'
+      - '.github/workflows/build-iso.yml'
 
 permissions:
   contents: read
@@ -39,6 +45,19 @@ jobs:
               chmod +x iso/build.sh
               ./iso/build.sh
             '
+      - name: Verify ISO output
+        shell: bash
+        run: |
+          shopt -s nullglob
+          images=(dist/*.iso)
+          if (( ${#images[@]} == 0 )); then
+            echo "No ISO image was produced." >&2
+            exit 1
+          fi
+          for image in "${images[@]}"; do
+            test -s "$image"
+            file "$image"
+          done
       - name: Generate checksums
         shell: bash
         run: |
