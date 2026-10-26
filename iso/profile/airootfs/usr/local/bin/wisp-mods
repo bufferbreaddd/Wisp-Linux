@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+command -v dialog >/dev/null || { echo 'dialog is required.' >&2; exit 1; }
+while true; do
+  choice=$(dialog --clear --title 'Wisp Mods' --menu 'Choose an integration to review. This early catalogue does not modify apps automatically.' 16 78 5 \
+    spicetify 'Spicetify — Spotify client customization' \
+    vencord 'Vencord — Discord client modification' \
+    back 'Exit catalogue' 3>&1 1>&2 2>&3) || exit 0
+  case "$choice" in
+    spicetify) dialog --title 'Spicetify' --msgbox 'Integration status: planned. Before installation, Wisp will check the Spotify install type, verify the official Spicetify installer instructions, create a backup, and provide a rollback path. No changes were made.' 10 72 || true ;;
+    vencord) dialog --title 'Vencord' --msgbox 'Integration status: planned. Wisp will only offer a documented, opt-in method with an uninstall path after compatibility checks. No changes were made.' 10 72 || true ;;
+    back) exit 0 ;;
+  esac
+done
