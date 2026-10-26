@@ -42,6 +42,7 @@ fn has_command(name: &str) -> bool {
 
 fn valid_package_name(name: &str) -> bool {
     !name.is_empty()
+        && !name.starts_with('-')
         && name.len() <= 180
         && name
             .chars()
