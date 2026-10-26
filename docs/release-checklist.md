@@ -20,7 +20,10 @@ This checklist is deliberately conservative. A successful image build is not the
 - [ ] Verify no disk operation starts before the user reviews and confirms choices in Archinstall.
 - [ ] Complete a test installation to a disposable virtual disk only.
 - [ ] Confirm the VM can reboot into the installed system.
-- [ ] Test the `wisp doctor`, `wisp store`, and `wisp mods` commands and ensure failures are understandable.\n- [ ] On a separate disposable installed Arch VM, test each `wisp desktop list` / `wisp desktop install <profile>` path; confirm cancel makes no changes, package failure does not enable services, and successful installation reaches a graphical login after reboot.\n- [ ] Confirm desktop profile installation refuses to run inside the temporary Archiso live environment.\n- [ ] Verify each supported desktop session can log in and has working network, audio, and basic graphics in the VM.
+- [ ] Test the `wisp doctor`, `wisp store`, and `wisp mods` commands and ensure failures are understandable.
+- [ ] On a separate disposable installed Arch VM, test each `wisp desktop list` / `wisp desktop install <profile>` path; confirm cancel makes no changes, package failure does not enable services, and successful installation reaches a graphical login after reboot.
+- [ ] Confirm desktop profile installation refuses to run inside the temporary Archiso live environment.
+- [ ] Verify each supported desktop session can log in and has working network, audio, and basic graphics in the VM.
 - [ ] Check the install log and confirm the store requires explicit confirmation before package installation.
 
 ## Release decision
