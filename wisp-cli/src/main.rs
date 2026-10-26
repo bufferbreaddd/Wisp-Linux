@@ -30,7 +30,7 @@ Package installs are interactive and require confirmation.");
 fn has_command(name: &str) -> bool {
     Command::new("sh")
         .arg("-c")
-        .arg("command -v "$1" >/dev/null 2>&1")
+        .arg("command -v \"$1\" >/dev/null 2>&1")
         .arg("wisp-check")
         .arg(name)
         .status()
@@ -52,6 +52,17 @@ fn command_ok(program: &str, args: &[&str]) -> bool {
         .unwrap_or(false)
 }
 
+fn unsafe_root_for_aur() -> bool {
+    if !cfg!(unix) {
+        return true;
+    }
+    Command::new("id")
+        .arg("-u")
+        .output()
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim() == "0")
+        .unwrap_or(true)
+}
+
 fn is_available(source: &str, package: &str) -> bool {
     match source {
         "repo" => command_ok("pacman", &["-Si", package]),
@@ -71,17 +82,6 @@ fn is_available(source: &str, package: &str) -> bool {
         "flatpak" => has_command("flatpak") && command_ok("flatpak", &["remote-info", "flathub", package]),
         _ => false,
     }
-}
-
-fn unsafe_root_for_aur() -> bool {
-    if !cfg!(unix) {
-        return true;
-    }
-    Command::new("id")
-        .arg("-u")
-        .output()
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim() == "0")
-        .unwrap_or(true)
 }
 
 fn choose_source(requested: &str, package: &str) -> Option<String> {
@@ -242,5 +242,29 @@ fn main() -> ExitCode {
             help();
             ExitCode::from(2)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::valid_package_name;
+
+    #[test]
+    fn accepts_common_package_identifiers() {
+        for name in ["firefox", "org.videolan.VLC", "python-pip", "foo_bar", "lib32-mesa"] {
+            assert!(valid_package_name(name), "should accept {name}");
+        }
+    }
+
+    #[test]
+    fn rejects_empty_or_option_like_names() {
+        for name in ["", "-S", "--config=/tmp/evil", "foo/bar", "a b", "x;id", "x\ny"] {
+            assert!(!valid_package_name(name), "should reject {name:?}");
+        }
+    }
+
+    #[test]
+    fn rejects_unreasonably_long_names() {
+        assert!(!valid_package_name(&"a".repeat(181)));
     }
 }
