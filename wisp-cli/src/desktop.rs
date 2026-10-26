@@ -143,7 +143,10 @@ fn run_privileged(program: &str, args: &[&str]) -> bool {
 fn list_profiles() {
     println!("Available Wisp desktop profiles:");
     for profile in PROFILES {
-        println!("  {:<10} {} — {}", profile.id, profile.name, profile.description);
+        println!(
+            "  {:<10} {} — {}",
+            profile.id, profile.name, profile.description
+        );
     }
 }
 
@@ -155,19 +158,38 @@ pub fn run(args: &[String]) -> ExitCode {
         }
         Some("install") if args.len() == 2 => {
             let Some(profile) = PROFILES.iter().find(|profile| profile.id == args[1]) else {
-                eprintln!("Unknown profile '{}'. Choose kde, gnome, or hyprland.", args[1]);
+                eprintln!(
+                    "Unknown profile '{}'. Choose kde, gnome, or hyprland.",
+                    args[1]
+                );
                 return ExitCode::from(2);
             };
 
+            if is_live_environment() {
+                eprintln!(
+                    "This is the live ISO environment. Desktop packages installed here would                      be temporary. Run this command after booting into your installed Arch system."
+                );
+                return ExitCode::from(2);
+            }
             if !is_arch() {
                 eprintln!("Desktop profile installation is supported only on Arch Linux.");
                 return ExitCode::from(2);
             }
-            if !Command::new("pacman").arg("--version").output().map(|o| o.status.success()).unwrap_or(false) {
+            if !Command::new("pacman")
+                .arg("--version")
+                .output()
+                .map(|output| output.status.success())
+                .unwrap_or(false)
+            {
                 eprintln!("pacman is required but was not found.");
                 return ExitCode::from(2);
             }
-            if !Command::new("systemctl").arg("--version").output().map(|o| o.status.success()).unwrap_or(false) {
+            if !Command::new("systemctl")
+                .arg("--version")
+                .output()
+                .map(|output| output.status.success())
+                .unwrap_or(false)
+            {
                 eprintln!("systemctl is required but was not found.");
                 return ExitCode::from(2);
             }
@@ -175,7 +197,10 @@ pub fn run(args: &[String]) -> ExitCode {
             println!("Profile: {} ({})", profile.name, profile.id);
             println!("{}", profile.description);
             println!("Packages: {}", profile.packages.join(", "));
-            println!("Services to enable after installation: NetworkManager, {}", profile.display_manager);
+            println!(
+                "Services to enable after installation: NetworkManager, {}",
+                profile.display_manager
+            );
             println!("No disk or partition changes will be made.");
             if !confirm("Install this desktop profile?") {
                 println!("Cancelled. No changes were made.");
@@ -200,7 +225,9 @@ pub fn run(args: &[String]) -> ExitCode {
             if !run_privileged("systemctl", &["enable", "NetworkManager.service"])
                 || !run_privileged("systemctl", &["enable", display_manager_service])
             {
-                eprintln!("Packages were installed, but service setup was incomplete. Review systemctl output.");
+                eprintln!(
+                    "Packages were installed, but service setup was incomplete. Review systemctl output."
+                );
                 return ExitCode::from(1);
             }
 
@@ -226,7 +253,11 @@ mod tests {
     #[test]
     fn profiles_have_unique_ids_and_nonempty_package_sets() {
         for (index, profile) in PROFILES.iter().enumerate() {
-            assert!(!profile.packages.is_empty(), "{} has no packages", profile.id);
+            assert!(
+                !profile.packages.is_empty(),
+                "{} has no packages",
+                profile.id
+            );
             assert!(profile.packages.contains(&profile.display_manager));
             assert!(profile.packages.contains(&"networkmanager"));
             assert!(
