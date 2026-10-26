@@ -21,12 +21,19 @@ cp -a "$RELENG/." "$PROFILE_DIR/"
 cp -a "$ROOT/iso/profile/airootfs/." "$PROFILE_DIR/airootfs/"
 cat "$ROOT/iso/profile/packages.x86_64" >> "$PROFILE_DIR/packages.x86_64"
 
-# Keep upstream boot modes and file permissions, changing only the image identity.
+# The repo stores only a text placeholder; make a real symlink in the build profile.
+mkdir -p "$PROFILE_DIR/airootfs/etc/systemd/system/multi-user.target.wants"
+ln -sfn /usr/lib/systemd/system/NetworkManager.service \
+  "$PROFILE_DIR/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service"
+
+# Keep upstream boot modes and permissions, changing only the image identity.
 sed -i 's/^iso_name=.*/iso_name="wisp-linux"/' "$PROFILE_DIR/profiledef.sh"
 sed -i 's/^iso_label=.*/iso_label="WISP_$(date +%Y%m)"/' "$PROFILE_DIR/profiledef.sh"
 sed -i 's/^iso_publisher=.*/iso_publisher="Wisp Linux Project"/' "$PROFILE_DIR/profiledef.sh"
 sed -i 's/^iso_application=.*/iso_application="Wisp Linux Live Network Installer"/' "$PROFILE_DIR/profiledef.sh"
 sed -i 's/^iso_version=.*/iso_version="$(date +%Y.%m.%d)"/' "$PROFILE_DIR/profiledef.sh"
-chmod 0755 "$PROFILE_DIR/airootfs/usr/local/bin/wisp-installer" "$PROFILE_DIR/airootfs/usr/local/bin/wisp-store"
+chmod 0755 "$PROFILE_DIR/airootfs/usr/local/bin/wisp-installer" \
+  "$PROFILE_DIR/airootfs/usr/local/bin/wisp-store" \
+  "$PROFILE_DIR/airootfs/usr/local/bin/wisp-mods"
 mkarchiso -v -w "$WORK_DIR" -o "$OUT_DIR" "$PROFILE_DIR"
 echo "Build complete. ISO files are in: $OUT_DIR"
