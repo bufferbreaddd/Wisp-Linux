@@ -4,6 +4,7 @@ base-devel
 curl
 dialog
 git
+iwd
 networkmanager
 openssh
 sudo
