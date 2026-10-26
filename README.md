@@ -8,7 +8,7 @@ Wisp aims to become a lightweight network installer with selectable desktops and
 
 ## What exists now
 
-- A Rust `wisp` CLI with package-source selection, confirmation before installation, and basic diagnostics.
+- A Rust `wisp` CLI with package-source selection, confirmation before installation, basic diagnostics, and an early KDE/GNOME/Hyprland package-profile installer.
 - A terminal app catalogue for a small set of repository packages.
 - A mods catalogue that explains planned integrations but does not install them yet.
 - An Archiso-based image build script and a GitHub Actions workflow intended to build the ISO and publish a checksum artifact.
@@ -16,8 +16,8 @@ Wisp aims to become a lightweight network installer with selectable desktops and
 
 ## Known limitations
 
-- The installer currently delegates to upstream Archinstall. Wisp-specific desktop selection, profile configuration, and post-install setup are **not implemented yet**.
-- The current image is a console-oriented installer preview, not a polished desktop live environment.
+- The installer currently delegates to upstream Archinstall. The new `wisp desktop install` command can install a profile on an already-installed Arch system, but it is **not integrated into the installer's target-system flow yet**.
+- The current image is a console-oriented installer preview, not a polished desktop live environment. Desktop profile commands refuse to run inside the temporary Archiso live environment.
 - The mods catalogue is informational only.
 - Performance optimization services and the planned desktop profiles are not implemented.
 - The ISO workflow has not been considered successful until a completed GitHub Actions run and a non-empty ISO artifact can be verified.
@@ -54,7 +54,7 @@ Wisp aims to become a lightweight network installer with selectable desktops and
 | Desktop profiles | Install and configure supported desktop environments |
 | ISO pipeline | Reproducible image build, checksums, and automated validation |
 
-## Development and build
+See [desktop profile status and limitations](docs/desktop-profiles.md) before using the early profile installer.\n\n## Development and build
 
 - [Source repository](https://github.com/bufferbreaddd/Wisp-Linux)
 - [GitHub Actions and build artifacts](https://github.com/bufferbreaddd/Wisp-Linux/actions)
