@@ -1,0 +1,10 @@
+# Wisp live image additions (merged with upstream Archiso releng package list)
+archinstall
+base-devel
+curl
+dialog
+git
+networkmanager
+openssh
+sudo
+xterm
