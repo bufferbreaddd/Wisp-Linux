@@ -1,0 +1,41 @@
+name: Build Wisp ISO
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'iso/**'
+      - 'wisp-cli/**'
+      - 'Cargo.toml'
+      - '.github/workflows/build-iso.yml'
+
+permissions:
+  contents: read
+ njobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Build Archiso in Arch Linux container
+        shell: bash
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          docker run --privileged --rm \
+            -v "$GITHUB_WORKSPACE:/src" \
+            -w /src \
+            archlinux:base-devel \
+            bash -euc 'pacman -Syu --noconfirm archiso cargo rust; cargo build --release --workspace; install -Dm755 target/release/wisp iso/profile/airootfs/usr/local/bin/wisp; chmod +x iso/build.sh; ./iso/build.sh'
+      - name: Generate checksums
+        shell: bash
+        run: |
+          cd dist
+          sha256sum *.iso > SHA256SUMS
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wisp-linux-iso
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
