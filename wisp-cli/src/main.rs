@@ -1,3 +1,5 @@
+mod desktop;
+
 use std::env;
 use std::io::{self, Write};
 use std::process::{Command, ExitCode};
@@ -268,6 +270,7 @@ fn main() -> ExitCode {
         Some("install") => install(&args[1..]),
         Some("store") => launch_tui("Wisp Store", "wisp-store"),
         Some("mods") => launch_tui("Wisp Mods", "wisp-mods"),
+        Some("desktop") => desktop::run(&args[1..]),
         Some(command) => {
             eprintln!("unknown command: {command}\n");
             help();
