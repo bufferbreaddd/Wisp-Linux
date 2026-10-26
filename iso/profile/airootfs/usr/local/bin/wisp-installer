@@ -14,33 +14,33 @@ fi
 command -v dialog >/dev/null || { echo "dialog is missing from the live environment."; exit 1; }
 command -v archinstall >/dev/null || { dialog --title 'Wisp Linux' --msgbox 'Archinstall is missing. This image is incomplete; no disks were changed.' 8 60; exit 1; }
 
-if ! dialog --title 'Welcome to Wisp Linux' --yesno 'Wisp is a lightweight Arch-based network installer. Selected desktops and apps are downloaded during setup. Installation can modify disks and erase data. Continue to preflight checks?' 11 72; then
+if ! dialog --title 'Welcome to Wisp Linux' --yesno 'Wisp is an early Arch-based network-installer preview. This release uses the upstream Archinstall interface; Wisp desktop selection and post-install setup are not integrated yet. Installation can modify disks and erase data. Continue to preflight checks?' 12 76; then
   exit 0
 fi
 
 while true; do
-  if curl -fsS --connect-timeout 5 https://archlinux.org/ >/dev/null; then
+  if curl -fsS --connect-timeout 5 --max-time 15 https://archlinux.org/ >/dev/null; then
     break
   fi
-  dialog --title 'Network required' --yesno 'Internet access is needed to download the base system and selected desktop. Check Wi-Fi or connect Ethernet, then retry. Open a shell to configure networking?' 10 72 || exit 1
+  dialog --title 'Network required' --yesno 'Internet access is needed to download the base system and packages. Check Wi-Fi or connect Ethernet, then retry. Open a shell to configure networking?' 10 72 || exit 1
   clear
   echo 'Network setup: use iwctl for Wi-Fi (for example: station wlan0 connect YOUR_WIFI_NAME), or connect Ethernet.'
   echo 'Run: systemctl start iwd; iwctl'
   echo 'When connected, type exit to return to the installer.'
   bash -i || true
- done
+done
 
 if ! dialog --title 'Before you begin' --yesno 'The next screen is Archinstall, the underlying Arch Linux installer. Review every disk and partition choice carefully. Wisp will not automatically select or resize partitions. Continue?' 10 72; then
   exit 0
 fi
 
 clear
+status=0
 archinstall || status=$?
-status=${status:-0}
 clear
 if (( status == 0 )); then
-  dialog --title 'Wisp installation step finished' --msgbox 'Archinstall has exited. Check its summary before rebooting. Wisp utilities are included in the live image; the post-install setup is still under development. Logs: /var/log/wisp/installer.log' 10 72 || true
+  dialog --title 'Installer step finished' --msgbox 'Archinstall has exited successfully. Review its summary before rebooting. This preview does not yet apply Wisp desktop profiles or post-install customizations. Logs: /var/log/wisp/installer.log' 10 76 || true
 else
-  dialog --title 'Installer exited' --msgbox "Archinstall returned status $status. No automatic retry was started. Review the on-screen error and logs before trying again. Wisp log: $LOG_FILE" 10 72 || true
+  dialog --title 'Installer exited' --msgbox "Archinstall returned status $status. No automatic retry was started. Review the on-screen error and logs before trying again. Wisp log: $LOG_FILE" 10 76 || true
 fi
 exit "$status"
