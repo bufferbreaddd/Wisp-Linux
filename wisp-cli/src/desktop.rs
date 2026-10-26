@@ -207,7 +207,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 return ExitCode::SUCCESS;
             }
 
-            let mut package_args = vec!["-S", "--needed", "--noconfirm"];
+            let mut package_args = vec!["-S", "--needed"];
             package_args.extend(profile.packages.iter().copied());
             if !run_privileged("pacman", &package_args) {
                 eprintln!("Package installation failed. Services were not changed.");
@@ -224,6 +224,7 @@ pub fn run(args: &[String]) -> ExitCode {
             };
             if !run_privileged("systemctl", &["enable", "NetworkManager.service"])
                 || !run_privileged("systemctl", &["enable", display_manager_service])
+                || !run_privileged("systemctl", &["set-default", "graphical.target"])
             {
                 eprintln!(
                     "Packages were installed, but service setup was incomplete. Review systemctl output."
