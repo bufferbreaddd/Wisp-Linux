@@ -19,7 +19,7 @@ Wisp aims to become a lightweight network installer with selectable desktops and
 - The installer currently delegates to upstream Archinstall. The new `wisp desktop install` command can install a profile on an already-installed Arch system, but it is **not integrated into the installer's target-system flow yet**.
 - The current image is a console-oriented installer preview, not a polished desktop live environment. Desktop profile commands refuse to run inside the temporary Archiso live environment.
 - The mods catalogue is informational only.
-- Performance optimization services and the planned desktop profiles are not implemented.
+- Performance optimization services are not implemented. Desktop profiles exist as an early CLI helper but are not integrated into the installer yet.
 - The ISO workflow has not been considered successful until a completed GitHub Actions run and a non-empty ISO artifact can be verified.
 - A successful image build alone does not prove the installer is safe or works on real hardware; test in a virtual machine first.
 
@@ -51,7 +51,7 @@ Wisp aims to become a lightweight network installer with selectable desktops and
 | Wisp Store TUI | Discover and install curated apps |
 | Wisp Mods TUI | Manage supported application modifications |
 | Performance services | Measured, reversible workload prioritization and memory-pressure handling |
-| Desktop profiles | Install and configure supported desktop environments |
+| Desktop profiles | Early CLI package installer for KDE Plasma, GNOME, and Hyprland; target-system integration and hardware testing remain |
 | ISO pipeline | Reproducible image build, checksums, and automated validation |
 
 See [desktop profile status and limitations](docs/desktop-profiles.md) before using the early profile installer.\n\n## Development and build
