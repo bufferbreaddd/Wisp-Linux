@@ -1,10 +1,27 @@
 # Wisp Linux
 
-**A lightweight, Arch-based Linux distribution focused on gaming, productivity, and developer workflows.**
+**An early Arch-based Linux distribution project focused on gaming, productivity, and developer workflows.**
 
-Wisp is designed around a small network-installer ISO. During installation, users choose their desktop environment and optional components; the installer downloads the selected packages instead of bundling every desktop and application into the ISO.
+Wisp aims to become a lightweight network installer with selectable desktops and optional components. The current repository is a prototype, not a finished daily-use operating system.
 
-> Status: early development. The project is not yet ready for installation on a daily-use machine.
+> **Current release status: build and installation are not yet verified.** Do not install this preview on a machine containing important data.
+
+## What exists now
+
+- A Rust `wisp` CLI with package-source selection, confirmation before installation, and basic diagnostics.
+- A terminal app catalogue for a small set of repository packages.
+- A mods catalogue that explains planned integrations but does not install them yet.
+- An Archiso-based image build script and a GitHub Actions workflow intended to build the ISO and publish a checksum artifact.
+- A network preflight in the installer, followed by the upstream Archinstall interface.
+
+## Known limitations
+
+- The installer currently delegates to upstream Archinstall. Wisp-specific desktop selection, profile configuration, and post-install setup are **not implemented yet**.
+- The current image is a console-oriented installer preview, not a polished desktop live environment.
+- The mods catalogue is informational only.
+- Performance optimization services and the planned desktop profiles are not implemented.
+- The ISO workflow has not been considered successful until a completed GitHub Actions run and a non-empty ISO artifact can be verified.
+- A successful image build alone does not prove the installer is safe or works on real hardware; test in a virtual machine first.
 
 ## Goals
 
@@ -12,14 +29,14 @@ Wisp is designed around a small network-installer ISO. During installation, user
 - Desktop selection at setup time, including KDE Plasma, GNOME, and Hyprland with ML4W dotfiles as an optional setup.
 - Gaming and productivity defaults, with AMD and NVIDIA support paths documented and tested separately.
 - A unified `wisp` command for package installation across pacman, a configured AUR helper, and Flatpak.
-- A TUI app catalogue with curated recommendations for gaming, development, and everyday use.
-- A mod manager that detects supported applications and offers documented integrations such as Spicetify and Vencord.
+- A TUI app catalogue for gaming, development, and everyday use.
+- A mod manager with compatibility checks, backups, and rollback.
 - Conservative performance services that prioritize the active workload without killing apps or applying unsafe system-wide tweaks.
 - Safe installation guidance for dual-boot and free-space installs, with explicit confirmation before any disk changes.
 
 ## Design principles
 
-1. **Small ISO, full installation choices.** Desktop environments and optional apps are downloaded during setup.
+1. **Small ISO, full installation choices.** Download optional desktops and apps during setup.
 2. **Safe by default.** No automatic destructive partitioning, silent disk resizing, or indiscriminate process killing.
 3. **Upstream first.** Use Arch repositories and official project installation methods wherever practical; keep third-party integrations transparent.
 4. **Test before claiming.** Features are not considered complete until their behavior and failure paths are tested.
@@ -37,14 +54,13 @@ Wisp is designed around a small network-installer ISO. During installation, user
 | Desktop profiles | Install and configure supported desktop environments |
 | ISO pipeline | Reproducible image build, checksums, and automated validation |
 
-## Repository layout
+## Development and build
 
-The repository will be organized into independently testable components. Proposed top-level areas include `installer/`, `packages/`, `wisp-cli/`, `wisp-store/`, `wisp-mods/`, `performance/`, `desktop-profiles/`, `iso/`, and `docs/`. The final layout will follow implementation needs rather than forcing every component into one monolith.
+- [Source repository](https://github.com/bufferbreaddd/Wisp-Linux)
+- [GitHub Actions and build artifacts](https://github.com/bufferbreaddd/Wisp-Linux/actions)
 
-## Development status
+The build workflow is intended to run on pushes that change ISO or Rust CLI files and can also be started manually from GitHub Actions. Treat its output as experimental until the build completes and the ISO has been boot-tested.
 
-This repository is in the foundation stage. Planned features above are goals, not claims that those features are already implemented. Initial work will establish architecture, safe installation boundaries, component interfaces, tests, and a reproducible build path before declaring an ISO ready.
+## Safety
 
-## Contributing and safety
-
-Do not test installation or partitioning workflows on a machine containing important data. Use a virtual machine or spare test disk until the installer has been reviewed and tested. Never run unreviewed scripts with root privileges on a daily-use system.
+Do not test installation or partitioning workflows on a machine containing important data. Use a virtual machine or spare test disk until the installer has been reviewed and tested. Always inspect partition and bootloader choices yourself; never assume a preview installer is safe for a daily-use machine.
