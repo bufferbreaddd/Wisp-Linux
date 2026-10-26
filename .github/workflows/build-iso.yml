@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
-      - name: Build Archiso in Arch Linux container
+      - name: Build and test Wisp tools in Arch Linux container
         shell: bash
         run: |
           mkdir -p "$GITHUB_WORKSPACE/dist"
@@ -27,7 +27,18 @@ jobs:
             -v "$GITHUB_WORKSPACE:/src" \
             -w /src \
             archlinux:base-devel \
-            bash -euc 'pacman -Syu --noconfirm archiso cargo rust; cargo build --release --workspace; install -Dm755 target/release/wisp iso/profile/airootfs/usr/local/bin/wisp; chmod +x iso/build.sh; ./iso/build.sh'
+            bash -euc '
+              pacman -Syu --noconfirm archiso cargo rust
+              bash -n iso/build.sh
+              bash -n iso/profile/airootfs/usr/local/bin/wisp-installer
+              bash -n iso/profile/airootfs/usr/local/bin/wisp-store
+              bash -n iso/profile/airootfs/usr/local/bin/wisp-mods
+              cargo test --workspace
+              cargo build --release --workspace
+              install -Dm755 target/release/wisp iso/profile/airootfs/usr/local/bin/wisp
+              chmod +x iso/build.sh
+              ./iso/build.sh
+            '
       - name: Generate checksums
         shell: bash
         run: |
