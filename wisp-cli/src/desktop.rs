@@ -91,7 +91,7 @@ fn is_root() -> bool {
         .unwrap_or(false)
 }
 
-fn is_arch() -> bool {
+fn is_live_environment() -> bool {\n    std::path::Path::new("/run/archiso").exists()\n}\n\nfn is_arch() -> bool {
     std::fs::read_to_string("/etc/os-release")
         .unwrap_or_default()
         .lines()
