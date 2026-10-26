@@ -5,7 +5,8 @@ use std::process::{Command, ExitCode};
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn help() {
-    println!("Wisp Linux tools {VERSION}
+    println!(
+        "Wisp Linux tools {VERSION}
 
 USAGE:
     wisp <COMMAND>
@@ -24,7 +25,8 @@ Examples:
     wisp install --source repo git
     wisp install --source flatpak org.videolan.VLC
 
-Package installs are interactive and require confirmation.");
+Package installs are interactive and require confirmation."
+    );
 }
 
 fn has_command(name: &str) -> bool {
@@ -41,7 +43,9 @@ fn has_command(name: &str) -> bool {
 fn valid_package_name(name: &str) -> bool {
     !name.is_empty()
         && name.len() <= 180
-        && name.chars().all(|c| c.is_ascii_alphanumeric() || "@._+-".contains(c))
+        && name
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || "@._+-".contains(c))
 }
 
 fn command_ok(program: &str, args: &[&str]) -> bool {
@@ -68,18 +72,24 @@ fn is_available(source: &str, package: &str) -> bool {
         "repo" => command_ok("pacman", &["-Si", package]),
         "aur" => {
             if unsafe_root_for_aur() {
-                eprintln!("Refusing to run an AUR helper as root. Sign in as a normal user and retry.");
+                eprintln!(
+                    "Refusing to run an AUR helper as root. Sign in as a normal user and retry."
+                );
                 false
             } else if has_command("paru") {
                 command_ok("paru", &["-Si", package])
             } else if has_command("yay") {
                 command_ok("yay", &["-Si", package])
             } else {
-                eprintln!("No AUR helper found. Install and configure paru or yay as a normal user first.");
+                eprintln!(
+                    "No AUR helper found. Install and configure paru or yay as a normal user first."
+                );
                 false
             }
         }
-        "flatpak" => has_command("flatpak") && command_ok("flatpak", &["remote-info", "flathub", package]),
+        "flatpak" => {
+            has_command("flatpak") && command_ok("flatpak", &["remote-info", "flathub", package])
+        }
         _ => false,
     }
 }
@@ -112,9 +122,13 @@ fn run_install(source: &str, package: &str) -> ExitCode {
     let result = match source {
         "repo" => {
             if unsafe_root_for_aur() {
-                Command::new("pacman").args(["-S", "--needed", package]).status()
+                Command::new("pacman")
+                    .args(["-S", "--needed", package])
+                    .status()
             } else if has_command("sudo") {
-                Command::new("sudo").args(["pacman", "-S", "--needed", package]).status()
+                Command::new("sudo")
+                    .args(["pacman", "-S", "--needed", package])
+                    .status()
             } else {
                 eprintln!("sudo is required to install system packages.");
                 return ExitCode::from(2);
@@ -126,14 +140,18 @@ fn run_install(source: &str, package: &str) -> ExitCode {
                 return ExitCode::from(2);
             }
             let helper = if has_command("paru") { "paru" } else { "yay" };
-            Command::new(helper).args(["-S", "--needed", package]).status()
+            Command::new(helper)
+                .args(["-S", "--needed", package])
+                .status()
         }
         "flatpak" => {
             if !has_command("flatpak") {
                 eprintln!("Flatpak is not installed.");
                 return ExitCode::from(2);
             }
-            Command::new("flatpak").args(["install", "--user", "flathub", package]).status()
+            Command::new("flatpak")
+                .args(["install", "--user", "flathub", package])
+                .status()
         }
         _ => return ExitCode::from(2),
     };
@@ -185,7 +203,9 @@ fn install(args: &[String]) -> ExitCode {
     }
 
     let Some(selected) = choose_source(source, package) else {
-        eprintln!("Could not verify '{package}' in the requested package source(s). No changes were made.");
+        eprintln!(
+            "Could not verify '{package}' in the requested package source(s). No changes were made."
+        );
         return ExitCode::from(1);
     };
     println!("Package: {package}\nSource:  {selected}");
@@ -200,9 +220,19 @@ fn doctor() -> ExitCode {
     let os_release = std::fs::read_to_string("/etc/os-release").unwrap_or_default();
     let is_arch = os_release.lines().any(|line| line == "ID=arch");
     println!("Wisp {VERSION}");
-    println!("Arch Linux: {}", if is_arch { "detected" } else { "not detected" });
+    println!(
+        "Arch Linux: {}",
+        if is_arch { "detected" } else { "not detected" }
+    );
     for cmd in ["pacman", "flatpak", "paru", "yay", "dialog", "archinstall"] {
-        println!("{cmd}: {}", if has_command(cmd) { "available" } else { "not found" });
+        println!(
+            "{cmd}: {}",
+            if has_command(cmd) {
+                "available"
+            } else {
+                "not found"
+            }
+        );
     }
     println!("diagnostic only: no system changes made");
     ExitCode::SUCCESS
@@ -251,14 +281,28 @@ mod tests {
 
     #[test]
     fn accepts_common_package_identifiers() {
-        for name in ["firefox", "org.videolan.VLC", "python-pip", "foo_bar", "lib32-mesa"] {
+        for name in [
+            "firefox",
+            "org.videolan.VLC",
+            "python-pip",
+            "foo_bar",
+            "lib32-mesa",
+        ] {
             assert!(valid_package_name(name), "should accept {name}");
         }
     }
 
     #[test]
     fn rejects_empty_or_option_like_names() {
-        for name in ["", "-S", "--config=/tmp/evil", "foo/bar", "a b", "x;id", "x\ny"] {
+        for name in [
+            "",
+            "-S",
+            "--config=/tmp/evil",
+            "foo/bar",
+            "a b",
+            "x;id",
+            "x\ny",
+        ] {
             assert!(!valid_package_name(name), "should reject {name:?}");
         }
     }
