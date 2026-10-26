@@ -4,7 +4,7 @@
 
 Wisp aims to become a lightweight network installer with selectable desktops and optional components. The current repository is a prototype, not a finished daily-use operating system.
 
-> **Current release status: build and installation are not yet verified.** Do not install this preview on a machine containing important data.
+> **Current branch status: the desktop-profile changes have not yet passed CI or installation testing.** The earlier console installer ISO built successfully, but that does not verify this branch or prove installation safety. Do not install this preview on a machine containing important data.
 
 ## What exists now
 
